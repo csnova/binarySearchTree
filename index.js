@@ -10,6 +10,114 @@ class Node {
 class Tree {
   constructor(arr) {
     this.root = buildTree(arr);
+    this.levelOrderList = [];
+    this.preOrderList = [];
+    this.inOrderList = [];
+    this.postOrderList = [];
+  }
+
+  insert(value) {
+    // Add a new node with this value
+  }
+
+  delete(value) {
+    // Delete a node with this value
+  }
+
+  find(value) {
+    // Find a node with this value
+  }
+
+  levelOrder(func = this.toArray) {
+    // Traverse the Tree in Level order, giving the values as an input for the function
+    if (this.root == null) {
+      return;
+    }
+
+    let queue = [this.root];
+    while (queue.length != 0) {
+      let node = queue.pop();
+      func(this.levelOrderList, node.data);
+      if (node.left) {
+        queue.unshift(node.left);
+      }
+      if (node.right) {
+        queue.unshift(node.right);
+      }
+    }
+    return this.levelOrderList;
+  }
+
+  preOrder(func) {
+    // Adds Items to List
+    this.preOrderList = [];
+    return this.printPreOrder(func);
+  }
+
+  printPreOrder(func = this.toArray, node = this.root) {
+    // Traverse the Tree preOrder, giving the values as an input for the function
+    if (node == null) {
+      return;
+    }
+    func(this.preOrderList, node.data);
+    this.printPreOrder(func, node.left);
+    this.printPreOrder(func, node.right);
+    return this.preOrderList;
+  }
+
+  inOrder(func) {
+    // Adds Items to List
+    this.inOrderList = [];
+    return this.printInOrder(func);
+  }
+
+  printInOrder(func = this.toArray, node = this.root) {
+    // Traverse the Tree InOrder, giving the values as an input for the function
+    if (node == null) {
+      return;
+    }
+    this.printInOrder(func, node.left);
+    func(this.inOrderList, node.data);
+    this.printInOrder(func, node.right);
+    return this.inOrderList;
+  }
+
+  postOrder(func) {
+    // Adds Items to List
+    this.postOrderList = [];
+    return this.printPostOrder(func);
+  }
+
+  printPostOrder(func = this.toArray, node = this.root) {
+    // Traverse the Tree PostOrder, giving the values as an input for the function
+    if (node == null) {
+      return;
+    }
+    this.printPostOrder(func, node.left);
+    this.printPostOrder(func, node.right);
+    func(this.postOrderList, node.data);
+    return this.postOrderList;
+  }
+
+  toArray(arr, value) {
+    // Default function to run for preOrder, inOrder, & postOrder
+    arr.push(value);
+  }
+
+  height(value) {
+    // Output the number of edges in longest path from a given node to a leaf node
+  }
+
+  depth(value) {
+    // Output the number of edges in path from a given node to the tree’s root node
+  }
+
+  isBalanced() {
+    // Checks if the tree is balanced
+  }
+
+  reBalance() {
+    // If tree is not balanced will reBalance it
   }
 }
 
@@ -79,50 +187,13 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 let arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 let root = new Tree(arr);
 
+// function printValues(arr, value) {
+//   console.log(value);
+// }
+// root.inOrder(printValues);
+
 prettyPrint(root.root);
-
-// /* A utility function to print preorder traversal of BST */
-// function preOrder(node) {
-//   if (node == null) {
-//     return;
-//   }
-//   document.write(node.data + " ");
-//   preOrder(node.left);
-//   preOrder(node.right);
-// }
-
-// /* A utility function to print inorder traversal of BST */
-// function inOrder(node) {
-//   if (node == null) {
-//     return;
-//   }
-//   inOrder(node.left);
-//   document.write(node.data + " ");
-//   inOrder(node.right);
-// }
-
-// /* A utility function to print postorder traversal of BST */
-// function postOrder(node) {
-//   if (node == null) {
-//     return;
-//   }
-//   postOrder(node.left);
-//   postOrder(node.right);
-//   document.write(node.data + " ");
-// }
-
-// let arr = [1, 2, 3, 4, 5, 6, 7];
-// root = sortedArrayToBST(arr, 0, arr.length - 1);
-
-// document.write("Preorder traversal of constructed BST<br>");
-// preOrder(root);
-
-// document.write("<br><br>");
-
-// document.write("Inorder traversal of constructed BST<br>");
-// inOrder(root);
-
-// document.write("<br><br>");
-
-// document.write("Postorder traversal of constructed BST<br>");
-// postOrder(root);
+console.log(root.levelOrder());
+console.log(root.preOrder());
+console.log(root.inOrder());
+console.log(root.postOrder());
