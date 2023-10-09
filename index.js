@@ -16,21 +16,103 @@ class Tree {
     this.postOrderList = [];
   }
 
-  insert(value) {
+  insert(value, node = this.root, parent = null) {
     // Add a new node with this value
+
+    // Base Case
+    if (node === null) {
+      node = new Node(value);
+      if (value < parent.data) {
+        parent.left = node;
+      } else if (value > parent.data) {
+        parent.right = node;
+      }
+    }
+
+    // Traverse Tree
+    else if (value < node.data) {
+      this.insert(value, node.left, node);
+    } else if (value > node.data) {
+      this.insert(value, node.right, node);
+    } else {
+      return;
+    }
   }
 
-  delete(value) {
+  delete(value, node = this.root, parent = null) {
     // Delete a node with this value
+
+    // Base Case
+    if (node === null) {
+      return;
+    }
+
+    // Find the node
+    if (value < node.data) {
+      this.delete(value, node.left, node);
+    } else if (value > node.data) {
+      this.delete(value, node.right, node);
+    }
+    // If we are at the value replace the children
+    else {
+      // For nodes with 0 children
+      if (node.left === null && node.right === null) {
+        parent.left = null;
+        parent.right = null;
+        return;
+      }
+      // For nodes with 1 child
+      else if (node.left !== null && node.right === null) {
+        if (parent.data > node.data) parent.left = node.left;
+        if (parent.data < node.data) parent.right = node.left;
+      } else if (node.left === null && node.right !== null) {
+        if (parent.data > node.data) parent.left = node.right;
+        if (parent.data < node.data) parent.right = node.right;
+      }
+      // For nodes with 2 children
+      else {
+        //
+        let nextLargest = node.right;
+        let nextLargestParent = node;
+        // Find the next largest node to the deleted value
+        while (nextLargest.left != null) {
+          nextLargestParent = nextLargest;
+          nextLargest = nextLargest.left;
+        }
+        nextLargestParent.left = null;
+        nextLargest.right = node.right;
+        nextLargest.left = node.left;
+        if (parent === null) this.root = nextLargest;
+        else if (parent.data > node.data) parent.left = nextLargest;
+        else if (parent.data < node.data) parent.right = nextLargest;
+      }
+    }
   }
 
   find(value) {
     // Find a node with this value
+    if (this.root == null) {
+      return "Empty Tree";
+    }
+
+    let queue = [this.root];
+    let node = this.root;
+    while (node.data !== value) {
+      if (queue.length === 0) return "Not in Tree";
+      node = queue.pop();
+      if (node.left) {
+        queue.unshift(node.left);
+      }
+      if (node.right) {
+        queue.unshift(node.right);
+      }
+    }
+    return node;
   }
 
   levelOrder(func = this.toArray) {
     // Traverse the Tree in Level order, giving the values as an input for the function
-    if (this.root == null) {
+    if (this.root === null) {
       return;
     }
 
@@ -56,7 +138,7 @@ class Tree {
 
   printPreOrder(func = this.toArray, node = this.root) {
     // Traverse the Tree preOrder, giving the values as an input for the function
-    if (node == null) {
+    if (node === null) {
       return;
     }
     func(this.preOrderList, node.data);
@@ -73,7 +155,7 @@ class Tree {
 
   printInOrder(func = this.toArray, node = this.root) {
     // Traverse the Tree InOrder, giving the values as an input for the function
-    if (node == null) {
+    if (node === null) {
       return;
     }
     this.printInOrder(func, node.left);
@@ -90,7 +172,7 @@ class Tree {
 
   printPostOrder(func = this.toArray, node = this.root) {
     // Traverse the Tree PostOrder, giving the values as an input for the function
-    if (node == null) {
+    if (node === null) {
       return;
     }
     this.printPostOrder(func, node.left);
@@ -100,7 +182,7 @@ class Tree {
   }
 
   toArray(arr, value) {
-    // Default function to run for preOrder, inOrder, & postOrder
+    // Default function to run for levelOrder, preOrder, inOrder, & postOrder
     arr.push(value);
   }
 
@@ -197,3 +279,7 @@ console.log(root.levelOrder());
 console.log(root.preOrder());
 console.log(root.inOrder());
 console.log(root.postOrder());
+console.log(root.find(3));
+// root.delete(4);
+root.insert(6);
+console.log(root.inOrder());
