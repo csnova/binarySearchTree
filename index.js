@@ -9,7 +9,7 @@ class Node {
 
 class Tree {
   constructor(arr) {
-    this.root = buildTree(arr);
+    this.root = this.buildTree(arr);
     this.levelOrderList = [];
     this.preOrderList = [];
     this.inOrderList = [];
@@ -91,7 +91,7 @@ class Tree {
 
   find(value) {
     // Find a node with this value
-    if (this.root == null) {
+    if (this.root === null) {
       return "Empty Tree";
     }
 
@@ -186,71 +186,95 @@ class Tree {
     arr.push(value);
   }
 
-  height(value) {
+  height(node) {
     // Output the number of edges in longest path from a given node to a leaf node
+    if (node === null) return -1;
+    const leftHeight = this.height(node.left);
+    const rightHeight = this.height(node.right);
+    return Math.max(leftHeight, rightHeight) + 1;
+    // }
   }
 
-  depth(value) {
+  depth(value, node = this.root, level = 0) {
     // Output the number of edges in path from a given node to the tree’s root node
+    if (node === null) {
+      return "Value Not in Tree";
+    } else if (value < node.data) {
+      level++;
+      return this.depth(value, node.left, level);
+    } else if (value > node.data) {
+      level++;
+      return this.depth(value, node.right, level);
+    }
+    return level;
   }
 
   isBalanced() {
     // Checks if the tree is balanced
+    const allNodes = this.inOrder();
+    for (let i = 0; i < allNodes.length; i++) {
+      const node = this.find(allNodes[i]);
+      const leftSubtree = this.height(node.left);
+      const rightSubtree = this.height(node.right);
+      if (Math.abs(leftSubtree - rightSubtree) > 1) return false;
+    }
+    return true;
   }
 
   reBalance() {
     // If tree is not balanced will reBalance it
-  }
-}
-
-function buildTree(arr) {
-  // If the array has zero parts it is done and should return
-  if (arr.length === 0) {
-    return null;
+    const currentTreeArray = this.inOrder();
+    this.root = this.buildTree(currentTreeArray);
   }
 
-  //   Sort the Array
-  arr = mergeSort(arr);
-
-  //   Finds the midpoint of the array
-  let mid = Math.round((arr.length - 1) / 2);
-
-  //   Makes a node from the current mid point
-  let node = new Node(arr[mid]);
-
-  //   Recursively makes left and right branches of tree
-  let leftArr = arr.slice(0, mid);
-  node.left = buildTree(leftArr);
-  let rightArr = arr.slice(mid + 1, arr.length);
-  node.right = buildTree(rightArr);
-
-  //   Returns the root node
-  return node;
-}
-
-function mergeSort(array) {
-  if (array.length <= 1) return array;
-
-  let half = Math.round(array.length / 2);
-
-  let lChunk = mergeSort(array.slice(0, half));
-  let rChunk = mergeSort(array.slice(half));
-
-  return merge(lChunk, rChunk);
-}
-
-function merge(a, b) {
-  let result = [];
-  while (a.length > 0 && b.length > 0) {
-    if (a[0] === b[0]) {
-      a.shift();
-    } else if (a[0] < b[0]) {
-      result.push(a.shift());
-    } else {
-      result.push(b.shift());
+  buildTree(arr) {
+    if (arr.length === 0) {
+      return null;
     }
+
+    //   Sort the Array
+    arr = this.mergeSort(arr);
+
+    //   Finds the midpoint of the array
+    let mid = Math.round((arr.length - 1) / 2);
+
+    //   Makes a node from the current mid point
+    let node = new Node(arr[mid]);
+
+    //   Recursively makes left and right branches of tree
+    let leftArr = arr.slice(0, mid);
+    node.left = this.buildTree(leftArr);
+    let rightArr = arr.slice(mid + 1, arr.length);
+    node.right = this.buildTree(rightArr);
+
+    //   Returns the root node
+    return node;
   }
-  return [...result, ...a, ...b];
+
+  mergeSort(array) {
+    if (array.length <= 1) return array;
+
+    let half = Math.round(array.length / 2);
+
+    let lChunk = this.mergeSort(array.slice(0, half));
+    let rChunk = this.mergeSort(array.slice(half));
+
+    return this.merge(lChunk, rChunk);
+  }
+
+  merge(a, b) {
+    let result = [];
+    while (a.length > 0 && b.length > 0) {
+      if (a[0] === b[0]) {
+        a.shift();
+      } else if (a[0] < b[0]) {
+        result.push(a.shift());
+      } else {
+        result.push(b.shift());
+      }
+    }
+    return [...result, ...a, ...b];
+  }
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -266,20 +290,31 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-let arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-let root = new Tree(arr);
+function randomNumbers(count, max) {
+  let allNumbers = [];
+  for (let i = 0; i < count; i++) {
+    let currentNum = Math.floor(Math.random() * max);
+    allNumbers.push(currentNum);
+  }
+  return allNumbers;
+}
 
-// function printValues(arr, value) {
-//   console.log(value);
-// }
-// root.inOrder(printValues);
+function driverTree(count, max) {
+  let arr = randomNumbers(count, max);
+  let root = new Tree(arr);
+  console.log(`Tree is Balanced: ${root.isBalanced()}`);
+  console.log(`Tree in Level Order: ${root.levelOrder()}`);
+  console.log(`Tree in Preorder Order: ${root.preOrder()}`);
+  console.log(`Tree in Inorder Order: ${root.inOrder()}`);
+  console.log(`Tree in Postorder Order: ${root.postOrder()}`);
+  root.insert(randomNumbers(1, 100));
+  root.insert(randomNumbers(1, 100));
+  root.insert(randomNumbers(1, 100));
+  console.log(`Tree is Balanced: ${root.isBalanced()}`);
+  root.reBalance();
+  console.log("Tree has been rebalanced");
+  console.log(`Tree is Balanced: ${root.isBalanced()}`);
+  return root;
+}
 
-prettyPrint(root.root);
-console.log(root.levelOrder());
-console.log(root.preOrder());
-console.log(root.inOrder());
-console.log(root.postOrder());
-console.log(root.find(3));
-// root.delete(4);
-root.insert(6);
-console.log(root.inOrder());
+prettyPrint(driverTree(20, 100).root);
